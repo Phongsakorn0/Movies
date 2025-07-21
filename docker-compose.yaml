@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres
+    volumes:
+      - db_data:/var/lib/postgresql
+    restart: always
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    ports:
+      - '5432:5432'
+volumes:
+  db_data:
+    driver: local
