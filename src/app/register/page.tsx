@@ -56,7 +56,7 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Handle successful registration
+        // Handle successful registration - redirect to login
         window.location.href = '/';
       } else {
         setError(data.error || 'Registration failed');

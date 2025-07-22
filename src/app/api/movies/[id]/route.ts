@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '../../../../../generated/prisma';
+import { verifyToken } from '../../../../lib/auth';
 
 const prisma = new PrismaClient();
 
-// GET /api/movies/[id] - Fetch a specific movie
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Verify token
+  const { isValid, error } = verifyToken(request);
+  if (!isValid) {
+    return NextResponse.json(
+      { error: error || 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   try {
     const id = parseInt(params.id);
     
@@ -39,11 +49,19 @@ export async function GET(
   }
 }
 
-// PUT /api/movies/[id] - Update a specific movie
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Verify token
+  const { isValid, error } = verifyToken(request);
+  if (!isValid) {
+    return NextResponse.json(
+      { error: error || 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   try {
     const id = parseInt(params.id);
     
@@ -105,11 +123,28 @@ export async function PUT(
   }
 }
 
-// DELETE /api/movies/[id] - Delete a specific movie
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Verify token
+  const { isValid, error } = verifyToken(request);
+  if (!isValid) {
+    return NextResponse.json(
+      { error: error || 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
+  // Check if user is MANAGER only MANAGER can delete movies
+  const user = verifyToken(request).user;
+  if (user?.role !== 'MANAGER') {
+    return NextResponse.json(
+      { error: 'Only MANAGER can delete movies' },
+      { status: 403 }
+    );
+  }
+  
   try {
     const id = parseInt(params.id);
     

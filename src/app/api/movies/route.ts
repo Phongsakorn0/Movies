@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '../../../../generated/prisma';
+import { verifyToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
 
 // GET /api/movies - Fetch all movies
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Verify token
+  const { isValid, error } = verifyToken(request);
+  if (!isValid) {
+    return NextResponse.json(
+      { error: error || 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   try {
     const movies = await prisma.movie.findMany({
       orderBy: {
@@ -24,6 +34,15 @@ export async function GET() {
 
 // POST /api/movies - Create a new movie
 export async function POST(request: NextRequest) {
+  // Verify token
+  const { isValid, error } = verifyToken(request);
+  if (!isValid) {
+    return NextResponse.json(
+      { error: error || 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   try {
     const { title, releaseDate, rating } = await request.json();
 

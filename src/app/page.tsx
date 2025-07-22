@@ -36,7 +36,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         // Handle successful login
-        window.location.href = 'movie';
+        window.location.href = '/movie';
       } else {
         setError(data.error || 'Login failed');
       }
